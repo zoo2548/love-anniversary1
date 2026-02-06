@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔐 Our Secret Gate</title>
+
+<style>
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffd1dc, #ffe6f0);
+  font-family: 'Segoe UI', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* 💎 Container */
+.container {
+  width: 85%;
+  max-width: 760px;
+  background: linear-gradient(180deg, #ffffff, #fff6fa);
+  border-radius: 35px;
+  padding: 28px;
+  box-shadow:
+    0 20px 40px rgba(255, 94, 153, 0.25),
+    inset 0 0 0 2px rgba(255,255,255,0.6);
+  display: flex;
+  gap: 28px;
+  position: relative;
+  z-index: 2;
+  animation: floatCard 4s ease-in-out infinite;
+}
+
+@keyframes floatCard {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+/* 🖼 รูปคู่ */
+.photo-box {
+  flex: 1;
+  border-radius: 25px;
+  overflow: hidden;
+  position: relative;
+}
+
+.photo-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ❌ สั่น */
+.shake {
+  animation: shake 0.4s;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-6px); }
+  100% { transform: translateX(0); }
+}
+
+/* 💔 ใจแตก */
+.broken {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 70px;
+  animation: fade 0.8s ease;
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 🔐 ฝั่งใส่รหัส */
+.lock {
+  flex: 1;
+  text-align: center;
+}
+
+h1 {
+  color: #ff5e99;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.hint {
+  font-size: 14px;
+  color: #ff8fb3;
+  margin-bottom: 14px;
+}
+
+/* 🔢 ช่องรหัส */
+.code {
+  font-size: 34px;
+  letter-spacing: 12px;
+  margin-bottom: 14px;
+  color: #ff5e99;
+  transition: transform 0.15s;
+  animation: blink 1.6s infinite;
+}
+
+@keyframes blink {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* 🔢 keypad */
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.keypad button {
+  padding: 18px 0;
+  font-size: 22px;
+  border-radius: 20px;
+  border: none;
+  background: linear-gradient(135deg, #ff7eb3, #ff5e99);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow:
+    0 8px 15px rgba(255,94,153,0.35),
+    inset 0 -3px 0 rgba(0,0,0,0.15);
+  transition: all 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.keypad button:active {
+  transform: scale(0.92);
+}
+
+.keypad button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.6), transparent 60%);
+  opacity: 0;
+}
+
+.keypad button:active::after {
+  opacity: 1;
+}
+
+.clear {
+  background: linear-gradient(135deg, #ffe1ea, #ffc2d6);
+  color: #ff5e99;
+}
+
+/* 💖 success */
+.success {
+  display: none;
+  margin-top: 16px;
+  font-size: 20px;
+  color: #ff5e99;
+  animation: pop 0.6s ease;
+  text-shadow: 0 0 12px rgba(255,94,153,0.6);
+}
+
+@keyframes pop {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* 📱 มือถือ */
+@media (max-width: 600px) {
+  .container {
+    flex-direction: column;
+  }
+  .photo-box {
+    height: 220px;
+  }
+}
+
+/* 💕 หัวใจลอย */
+.heart {
+  position: fixed;
+  bottom: -40px;
+  font-size: 22px;
+  animation: floatUp linear forwards;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes floatUp {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-110vh); opacity: 0; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- 🖼 รูปคู่ -->
+  <div class="photo-box" id="photoBox">
+    <img id="slideshow">
+  </div>
+
+  <!-- 🔐 ใส่รหัส -->
+  <div class="lock">
+    <h1>🔐 </h1>
+    <p class="subtitle">มีแค่ที่รักตัวจริงที่รู้รหัสนี้ 💕</p>
+    <div class="hint">วันที่เราคบกัน 💌</div>
+
+    <div class="code" id="display">_______</div>
+
+    <div class="keypad">
+      <button onclick="press(1)">1</button>
+      <button onclick="press(2)">2</button>
+      <button onclick="press(3)">3</button>
+      <button onclick="press(4)">4</button>
+      <button onclick="press(5)">5</button>
+      <button onclick="press(6)">6</button>
+      <button onclick="press(7)">7</button>
+      <button onclick="press(8)">8</button>
+      <button onclick="press(9)">9</button>
+      <button class="clear" onclick="reset()">⌫</button>
+      <button onclick="press(0)">0</button>
+      <button class="clear" onclick="check()">OK</button>
+    </div>
+
+    <div class="success" id="success">
+      ที่รักของเค้าเก่งที่สู๊ด 🥰 
+    </div>
+  </div>
+</div>
+
+<script>
+/* 💕 หัวใจลอย */
+const hearts = ["💖","💕","💗","💞","💘"];
+setInterval(() => {
+  const h = document.createElement("div");
+  h.className = "heart";
+  h.textContent = hearts[Math.floor(Math.random()*hearts.length)];
+  h.style.left = Math.random()*100 + "vw";
+  h.style.animationDuration = 4 + Math.random()*3 + "s";
+  document.body.appendChild(h);
+  setTimeout(() => h.remove(), 7000);
+}, 600);
+
+/* 🖼 slideshow */
+const images = ["LINE_ALBUM_อ้วน💖🥰_260105_2.jpg","LINE_ALBUM_อ้วน💖🥰_260205_5.jpg","S__16228357.jpg"];
+let imgIndex = 0;
+const slide = document.getElementById("slideshow");
+slide.src = images[0];
+setInterval(() => {
+  imgIndex = (imgIndex + 1) % images.length;
+  slide.src = images[imgIndex];
+}, 3000);
+
+/* 🔐 ระบบรหัส */
+const correctCode = "5012568"; // ← เปลี่ยนรหัสตรงนี้
+let input = "";
+const display = document.getElementById("display");
+const success = document.getElementById("success");
+const photoBox = document.getElementById("photoBox");
+
+function popDisplay() {
+  display.style.transform = "scale(1.15)";
+  setTimeout(() => display.style.transform = "scale(1)", 120);
+}
+
+function press(n) {
+  if (input.length >= 7) return;
+  input += n;
+  display.textContent = input.padEnd(7, "_");
+  popDisplay();
+}
+
+function reset() {
+  input = "";
+  display.textContent = "_______";
+}
+
+function check() {
+  if (input === correctCode) {
+    success.style.display = "block";
+    setTimeout(() => location.href = "Activity1.html", 2000);
+  } else {
+    reset();
+    photoBox.classList.add("shake");
+
+    const broken = document.createElement("div");
+    broken.className = "broken";
+    broken.textContent = "💔";
+    photoBox.appendChild(broken);
+
+    setTimeout(() => {
+      photoBox.classList.remove("shake");
+      broken.remove();
+    }, 800);
+  }
+}
+</script>
+
+</body>
+</html>

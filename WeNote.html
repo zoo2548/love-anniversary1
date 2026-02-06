@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Secret Chat - iPad Edition</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&family=Caveat:wght@700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #fff5f7 0%, #ffd1dc 100%);
+      --glass: rgba(255, 255, 255, 0.45);
+      --accent-pink: #ff5e99;
+      --soft-shadow: 0 20px 50px rgba(255, 143, 179, 0.15);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      font-family: 'Kanit', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .ipad-frame {
+      width: 90vw;
+      max-width: 1100px;
+      height: 85vh;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 2px solid rgba(255, 255, 255, 0.7);
+      border-radius: 40px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--soft-shadow);
+      position: relative;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .main-title {
+      font-family: 'Caveat', cursive;
+      font-size: 2.5rem;
+      color: var(--accent-pink);
+      margin: 0;
+    }
+
+    .board {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 25px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      background-image: radial-gradient(rgba(255, 94, 153, 0.1) 1.5px, transparent 1.5px);
+      background-size: 30px 30px;
+    }
+
+    .input-area {
+      margin-top: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 25px;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      flex-wrap: wrap;
+    }
+
+    input[type="text"], input[type="number"] {
+      padding: 12px;
+      border: 1px solid #eee;
+      border-radius: 15px;
+      outline: none;
+      font-family: 'Kanit';
+    }
+
+    .note {
+      position: absolute;
+      width: 150px;
+      min-height: 150px;
+      padding: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      cursor: move;
+      font-family: 'Caveat', cursive;
+      font-size: 1.4rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      border-radius: 5px;
+    }
+
+    /* เอฟเฟกต์สั่นเมื่อใกล้หมดเวลา */
+    @keyframes shake {
+      0% { transform: translate(1px, 1px) rotate(0deg); }
+      10% { transform: translate(-1px, -2px) rotate(-1deg); }
+      20% { transform: translate(-3px, 0px) rotate(1deg); }
+      30% { transform: translate(3px, 2px) rotate(0deg); }
+      40% { transform: translate(1px, -1px) rotate(1deg); }
+      50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    }
+
+    .shaking {
+      animation: shake 0.5s infinite;
+      border: 2px solid #ff4d4d !important;
+    }
+
+    .expiry-tag {
+      font-size: 0.7rem;
+      font-family: 'Kanit';
+      margin-top: 10px;
+      color: #888;
+    }
+
+    .btn-add {
+      background: var(--accent-pink);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 15px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ipad-frame">
+    <div class="header">
+      <a href="Activity1.html" style="text-decoration:none; color:var(--accent-pink);">← Back</a>
+      <h1 class="main-title">Secret Board</h1>
+      <button onclick="clearBoard()" style="background:none; border:none; cursor:pointer; font-size:0.8rem; color:#888;">ล้างบอร์ด</button>
+    </div>
+    
+    <div class="board" id="board"></div>
+
+    <div class="input-area">
+      <input type="text" id="noteInput" placeholder="พิมพ์ข้อความ..." style="flex:2;">
+      <input type="number" id="expiryInput" placeholder="วัน" style="width:70px;" min="1" value="7">
+      <button class="btn-add" onclick="addNote()">Post it!</button>
+    </div>
+  </div>
+
+  <script>
+    const board = document.getElementById('board');
+    const colors = ['#ffffff', '#fff0f3', '#ffe3e8', '#fff9db', '#f0f4ff'];
+    let notesData = JSON.parse(localStorage.getItem('secret_notes')) || [];
+
+    // เริ่มต้นโหลดข้อมูล
+    window.onload = renderNotes;
+
+    function addNote() {
+      const text = document.getElementById('noteInput').value;
+      const days = parseInt(document.getElementById('expiryInput').value) || 7;
+      if (!text) return;
+
+      const now = new Date();
+      const expiryDate = new Date();
+      expiryDate.setDate(now.getDate() + days);
+
+      const newNote = {
+        id: Date.now(),
+        text: text,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rotate: (Math.random() - 0.5) * 15,
+        x: Math.random() * (board.clientWidth - 160),
+        y: Math.random() * (board.clientHeight - 160),
+        expiry: expiryDate.getTime()
+      };
+
+      notesData.push(newNote);
+      saveAndRender();
+      document.getElementById('noteInput').value = '';
+    }
+
+    function renderNotes() {
+      board.innerHTML = '';
+      const now = new Date().getTime();
+
+      notesData = notesData.filter(data => {
+        // ลบโน้ตที่หมดเวลาแล้วจริงๆ ออกจากระบบ
+        return now < data.expiry;
+      });
+
+      notesData.forEach(data => {
+        const note = document.createElement('div');
+        note.className = 'note';
+        
+        // คำนวณเวลาที่เหลือ
+        const timeLeft = data.expiry - now;
+        const twoDaysInMs = 2 * 24 * 60 * 60 * 1000;
+
+        // ถ้าเหลือน้อยกว่า 2 วัน ให้ใส่ Class สั่น
+        if (timeLeft < twoDaysInMs) {
+          note.classList.add('shaking');
+        }
+
+        note.style.backgroundColor = data.color;
+        note.style.left = data.x + 'px';
+        note.style.top = data.y + 'px';
+        note.style.transform = `rotate(${data.rotate}deg)`;
+        
+        const dateStr = new Date(data.expiry).toLocaleDateString('th-TH');
+        note.innerHTML = `
+          <div>${data.text}</div>
+          <div class="expiry-tag">หมดอายุ: ${dateStr}</div>
+        `;
+
+        makeDraggable(note, data);
+        board.appendChild(note);
+      });
+      localStorage.setItem('secret_notes', JSON.stringify(notesData));
+    }
+
+    function makeDraggable(el, data) {
+      let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+      const dragStart = (e) => {
+        const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+        const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+        pos3 = clientX;
+        pos4 = clientY;
+        el.style.zIndex = "1000";
+      };
+
+      const dragMove = (e) => {
+        const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+        const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+        pos1 = pos3 - clientX;
+        pos2 = pos4 - clientY;
+        pos3 = clientX;
+        pos4 = clientY;
+        
+        const newTop = el.offsetTop - pos2;
+        const newLeft = el.offsetLeft - pos1;
+        
+        el.style.top = newTop + "px";
+        el.style.left = newLeft + "px";
+        
+        // อัปเดตตำแหน่งในข้อมูล
+        data.x = newLeft;
+        data.y = newTop;
+      };
+
+      const dragEnd = () => {
+        el.style.zIndex = "10";
+        localStorage.setItem('secret_notes', JSON.stringify(notesData));
+      };
+
+      el.onmousedown = (e) => {
+        dragStart(e);
+        document.onmousemove = dragMove;
+        document.onmouseup = dragEnd;
+      };
+
+      el.addEventListener('touchstart', dragStart, {passive: false});
+      el.addEventListener('touchmove', (e) => { dragMove(e); e.preventDefault(); }, {passive: false});
+      el.addEventListener('touchend', dragEnd);
+    }
+
+    function saveAndRender() {
+      localStorage.setItem('secret_notes', JSON.stringify(notesData));
+      renderNotes();
+    }
+
+    function clearBoard() {
+      if(confirm('ล้างโน้ตทั้งหมดหรือไม่?')) {
+        notesData = [];
+        saveAndRender();
+      }
+    }
+
+    // ตรวจสอบเวลาทุกๆ 1 นาที เพื่ออัปเดตอาการสั่นหรือลบโน้ต
+    setInterval(renderNotes, 60000);
+
+  </script>
+</body>
+</html>

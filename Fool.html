@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🍱 Our Forever Foodies</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&family=Caveat:wght@700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #fff5f7 0%, #ffd1dc 100%);
+      --glass: rgba(255, 255, 255, 0.45);
+      --accent-pink: #ff5e99;
+      --white: rgba(255, 255, 255, 0.9);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      font-family: 'Kanit', sans-serif;
+      padding: 40px 20px;
+    }
+
+    .btn-back {
+      position: fixed;
+      top: 25px;
+      left: 25px;
+      background: var(--white);
+      padding: 12px 20px;
+      border-radius: 50px;
+      text-decoration: none;
+      color: var(--accent-pink);
+      font-weight: bold;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+      z-index: 1000;
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-family: 'Caveat', cursive;
+      font-size: 4rem;
+      color: var(--accent-pink);
+      margin: 0;
+    }
+
+    .food-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 25px;
+      margin-top: 40px;
+    }
+
+    .food-slot {
+      aspect-ratio: 1 / 1;
+      background: var(--glass);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border-radius: 30px;
+      border: 2px solid rgba(255, 255, 255, 0.7);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(255, 143, 179, 0.1);
+      transition: 0.4s;
+    }
+
+    .food-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0; /* เริ่มต้นซ่อนไว้ */
+      transition: opacity 0.5s ease;
+    }
+
+    /* ถ้าไม่มีรูปจะโชว์ไอคอนหัวใจจางๆ */
+    .food-slot::before {
+      content: '🍽️';
+      position: absolute;
+      font-size: 3rem;
+      opacity: 0.2;
+      z-index: 0;
+    }
+
+    .food-slot:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(255, 143, 179, 0.2);
+    }
+
+    /* หัวใจลอยธีมเดิม */
+    .heart {
+      position: fixed;
+      bottom: -20px;
+      pointer-events: none;
+      z-index: -1;
+      animation: floatUp linear forwards;
+    }
+
+    @keyframes floatUp {
+      to { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="Activity1.html" class="btn-back">← กลับหน้าหลัก</a>
+
+  <div class="container">
+    <div class="header">
+      <h1>Foodie Forever</h1>
+      <p style="color: #888;">บันทึกเมนูที่กินด้วยกันตลอดไป ✨</p>
+    </div>
+
+    <div class="food-grid" id="foodGrid">
+      </div>
+  </div>
+
+<script>
+  // 1. นำรหัส Base64 ของรูปภาพ .jpg มาใส่ในอาร์เรย์นี้
+  // คุณสามารถก๊อปปี้รหัสยาวๆ มาใส่ในเครื่องหมายคำพูดได้เลย
+  const myImages = [
+    "LINE_ALBUM_12968 _1_260206_1.jpg",
+    "LINE_ALBUM_12968 _1_260206_2.jpg",
+    "LINE_ALBUM_12968 _1_260206_3.jpg",
+    "LINE_ALBUM_12968 _1_260206_4.jpg",
+    "LINE_ALBUM_12968 _1_260206_5.jpg",
+    "LINE_ALBUM_12968 _1_260206_6.jpg",
+    "ใส่รหัสรูปภาพที่ 7 ตรงนี้",
+    "ใส่รหัสรูปภาพที่ 8 ตรงนี้",
+    "ใส่รหัสรูปภาพที่ 9 ตรงนี้",
+    "ใส่รหัสรูปภาพที่ 10 ตรงนี้",
+    "ใส่รหัสรูปภาพที่ 11 ตรงนี้",
+    "ใส่รหัสรูปภาพที่ 12 ตรงนี้"
+  ];
+
+  const grid = document.getElementById('foodGrid');
+
+  // วนลูปสร้างช่องตามจำนวนรูปใน myImages
+  myImages.forEach((src, index) => {
+    const slot = document.createElement('div');
+    slot.className = 'food-slot';
+    
+    const img = document.createElement('img');
+    // ตรวจสอบว่ามีข้อมูลรูปหรือไม่
+    if (src.length > 30) { 
+      img.src = src;
+      img.style.opacity = '1';
+    }
+
+    slot.appendChild(img);
+    grid.appendChild(slot);
+  });
+
+  // หัวใจลอย (Theme เดิม)
+  setInterval(() => {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.innerHTML = ["💖","💗","💕","🌸"][Math.floor(Math.random()*4)];
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.fontSize = (Math.random() * 20 + 10) + "px";
+    heart.style.animationDuration = (Math.random() * 3 + 4) + "s";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 6000);
+  }, 800);
+</script>
+
+</body>
+</html>

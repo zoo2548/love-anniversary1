@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>💖 Memory Game - Surprise Edition</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&family=Caveat:wght@700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #fff5f7 0%, #ffd1dc 100%);
+      --glass: rgba(255, 255, 255, 0.6);
+      --accent-pink: #ff5e99;
+      --card-back: linear-gradient(45deg, #ffb6c1, #ffc0cb);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      font-family: 'Kanit', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start; 
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 80px 20px 40px 20px;
+    }
+
+    /* ปุ่มย้อนกลับ */
+    .btn-back {
+      position: fixed;
+      top: 20px; left: 20px;
+      background: white;
+      padding: 10px 18px;
+      border-radius: 50px;
+      text-decoration: none;
+      color: var(--accent-pink);
+      font-weight: bold;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+      z-index: 1000;
+    }
+
+    .game-board {
+      width: 100%;
+      max-width: 600px;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 40px;
+      padding: 30px;
+      border: 2px solid rgba(255,255,255,0.7);
+      box-shadow: 0 25px 50px rgba(255, 143, 179, 0.15);
+      text-align: center;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-family: 'Caveat', cursive;
+      font-size: 3rem;
+      color: var(--accent-pink);
+      margin: 0 0 10px 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    /* Card Styling */
+    .card-item {
+      aspect-ratio: 1/1;
+      position: relative;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card-item.open { transform: rotateY(180deg); }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%; height: 100%;
+      backface-visibility: hidden;
+      border-radius: 12px;
+      border: 3px solid white;
+    }
+
+    .card-back {
+      background: var(--card-back);
+      display: flex; justify-content: center; align-items: center;
+      font-size: 1.5rem; color: white;
+    }
+
+    .card-front {
+      background: white;
+      transform: rotateY(180deg);
+      overflow: hidden;
+    }
+
+    .card-front img { width: 100%; height: 100%; object-fit: cover; }
+
+    .card-item.matched { opacity: 0.5; transform: rotateY(180deg) scale(0.9); }
+
+    /* --- Popup Overlay --- */
+    #overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      flex-direction: column;
+      backdrop-filter: blur(5px);
+    }
+
+    #popup-img {
+      max-width: 80%;
+      max-height: 70vh;
+      border-radius: 20px;
+      border: 5px solid white;
+      box-shadow: 0 0 30px rgba(255,255,255,0.3);
+      transform: scale(0.5);
+      transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    #overlay.show #popup-img { transform: scale(1); }
+
+    .popup-text {
+      color: white;
+      font-family: 'Caveat', cursive;
+      font-size: 2.5rem;
+      margin-top: 20px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    .btn-restart {
+      background: var(--accent-pink);
+      color: white; border: none;
+      padding: 12px 35px; border-radius: 50px;
+      font-size: 1.1rem; font-weight: bold;
+      cursor: pointer; margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+<a href="Activity1.html" class="btn-back">← กลับ</a>
+
+<div id="overlay" onclick="closePopup()">
+  <img id="popup-img" src="" alt="Matched">
+  <div class="popup-text">เย้! เจอแล้ว 💕</div>
+  <p style="color: #ccc;">(แตะหน้าจอเพื่อปิด)</p>
+</div>
+
+<div class="game-board">
+  <h1>Memory of Us</h1>
+  <p>จับคู่รูปภาพของเรากันเด้อ!</p>
+
+  <div class="grid" id="grid"></div>
+
+  <div id="result" style="height: 40px; color: var(--accent-pink); font-size: 1.2rem; font-weight: bold;"></div>
+  <button class="btn-restart" onclick="restart()">เริ่มเล่นใหม่ 🔄</button>
+</div>
+
+<script>
+  const images = [
+    "LINE_ALBUM_อ้วน💖🥰_260105_2.jpg", "LINE_ALBUM_อ้วน💖🥰_260205_5.jpg", 
+    "S__16228357.jpg", "S__16228355.jpg",
+    "LINE_ALBUM_อ้วน💖🥰_260205_9.jpg", "LINE_ALBUM_อ้วน💖🥰_260206_1.jpg", 
+    "LINE_ALBUM_อ้วน💖🥰_260206_2.jpg", "LINE_ALBUM_อ้วน💖🥰_260206_3.jpg"
+  ];
+
+  let cards = [];
+  let firstCard = null;
+  let lock = false;
+  let matchedCount = 0;
+
+  function shuffle() {
+    cards = [...images, ...images].sort(() => Math.random() - 0.5);
+  }
+
+  function createBoard() {
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+    matchedCount = 0;
+    document.getElementById("result").textContent = "";
+    cards.forEach((imgSrc) => {
+      const card = document.createElement("div");
+      card.className = "card-item";
+      card.innerHTML = `
+        <div class="card-back">💖</div>
+        <div class="card-front"><img src="${imgSrc}"></div>
+      `;
+      card.addEventListener("click", () => flip(card, imgSrc));
+      grid.appendChild(card);
+    });
+  }
+
+  function flip(card, img) {
+    if (lock || card.classList.contains("open") || card.classList.contains("matched")) return;
+    card.classList.add("open");
+
+    if (!firstCard) {
+      firstCard = { card, img };
+    } else {
+      if (firstCard.card === card) return;
+      lock = true;
+
+      if (firstCard.img === img) {
+        // จับคู่ถูก
+        card.classList.add("matched");
+        firstCard.card.classList.add("matched");
+        matchedCount += 2;
+        
+        // --- ส่วนที่โชว์รูปภาพขยายใหญ่ ---
+        setTimeout(() => {
+          showPopup(img);
+        }, 600);
+
+        reset();
+      } else {
+        setTimeout(() => {
+          card.classList.remove("open");
+          firstCard.card.classList.remove("open");
+          reset();
+        }, 1000);
+      }
+    }
+  }
+
+  function showPopup(imgSrc) {
+    const overlay = document.getElementById("overlay");
+    const popupImg = document.getElementById("popup-img");
+    popupImg.src = imgSrc;
+    overlay.style.display = "flex";
+    setTimeout(() => overlay.classList.add("show"), 10);
+  }
+
+  function closePopup() {
+    const overlay = document.getElementById("overlay");
+    overlay.classList.remove("show");
+    setTimeout(() => {
+      overlay.style.display = "none";
+      if (matchedCount === cards.length) {
+        document.getElementById("result").textContent = "เก่งที่สุดเลยคนดี! รักเธอจัง ✨";
+      }
+    }, 300);
+  }
+
+  function reset() { firstCard = null; lock = false; }
+  function restart() { shuffle(); createBoard(); }
+
+  shuffle();
+  createBoard();
+</script>
+
+</body>
+</html>

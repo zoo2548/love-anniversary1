@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🧩 Love Jigsaw - iPad Edition</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&family=Caveat:wght@700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #fff5f7 0%, #ffd1dc 100%);
+      --glass: rgba(255, 255, 255, 0.45);
+      --accent-pink: #ff5e99;
+      --soft-pink: #ff8fb3;
+      --white: rgba(255, 255, 255, 0.9);
+    }
+
+    /* ป้องกันการเลือกข้อความและการเด้งของเมนูบน iPad */
+    * { 
+      box-sizing: border-box; 
+      -webkit-tap-highlight-color: transparent; 
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      font-family: 'Kanit', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /* เปลี่ยนจาก overflow: hidden เป็น auto เพื่อให้สกรูได้ถ้าเนื้อหาเกินจอ */
+      overflow-y: auto; 
+    }
+
+    .btn-back {
+      position: fixed;
+      top: 25px;
+      left: 25px;
+      background: var(--white);
+      padding: 12px 20px;
+      border-radius: 50px;
+      text-decoration: none;
+      color: var(--accent-pink);
+      font-weight: bold;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+      z-index: 100;
+      transition: 0.3s;
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    .btn-back:hover { background: var(--accent-pink); color: white; }
+
+    .game-container {
+      width: 95vw;
+      max-width: 800px;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      border-radius: 40px;
+      padding: 40px 20px;
+      text-align: center;
+      box-shadow: 0 25px 50px rgba(255, 143, 179, 0.15);
+      position: relative;
+      margin: 40px 0;
+    }
+
+    h1 {
+      font-family: 'Caveat', cursive;
+      font-size: 3.5rem;
+      color: var(--accent-pink);
+      margin: 0 0 10px 0;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    select {
+      padding: 12px 20px;
+      border-radius: 15px;
+      border: 1px solid rgba(255,255,255,0.8);
+      background: white;
+      color: #666;
+      font-family: 'Kanit';
+      cursor: pointer;
+      outline: none;
+      min-width: 150px;
+    }
+
+    .canvas-area {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 30px;
+      padding: 15px;
+      display: inline-block;
+      box-shadow: inset 0 5px 15px rgba(0,0,0,0.05);
+      border: 2px dashed rgba(255, 255, 255, 0.8);
+      max-width: 100%;
+    }
+
+    canvas {
+      border-radius: 20px;
+      max-width: 100%;
+      height: auto;
+      touch-action: none; /* คุมด้วย JS แทน */
+      cursor: grab;
+    }
+
+    canvas:active { cursor: grabbing; }
+
+    .btn-shuffle {
+      margin-top: 25px;
+      background: var(--accent-pink);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 15px 40px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 10px 20px rgba(255, 94, 153, 0.3);
+    }
+
+    .win-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 30px 50px;
+      border-radius: 30px;
+      display: none;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      z-index: 10;
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      width: 80%;
+    }
+
+    @keyframes popIn {
+      0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<a href="Activity1.html" class="btn-back">← กลับหน้าหลัก</a>
+
+<div class="game-container">
+  <h1>Love Jigsaw</h1>
+  <p style="color: #888; margin-bottom: 25px;">ต่อภาพความทรงจำของเราให้สมบูรณ์นะจ๊ะ 🥰</p>
+
+  <div class="controls">
+    <select id="imageSelect">
+      <option value="LINE_ALBUM_อ้วน💖🥰_260206_4.jpg">รูปความทรงจำ 1 📸</option>
+      <option value="LINE_ALBUM_อ้วน💖🥰_260105_2.jpg">รูปความทรงจำ 2 📸</option>
+      <option value="S__16228355.jpg">รูปความทรงจำ 3 📸</option>
+      <option value="S__16228357.jpg">รูปความทรงจำ 4 📸</option>
+    </select>
+
+    <select id="difficulty">
+      <option value="3">3 × 3 (ง่าย)</option>
+      <option value="4">4 × 4 (ปานกลาง)</option>
+      <option value="6" selected>6 × 6 (ท้าทาย)</option>
+    </select>
+  </div>
+
+  <div class="canvas-area">
+    <canvas id="canvas" width="500" height="500"></canvas>
+  </div>
+
+  <br>
+  <button class="btn-shuffle" onclick="shufflePieces()">สลับชิ้นส่วนใหม่ 🧩</button>
+
+  <div class="win-overlay" id="winText">
+    <h2 style="color: var(--accent-pink); margin: 0;">เก่งที่สุดเลย! รักเธอนะจุ๊บๆ ❤️</h2>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const imageSelect = document.getElementById("imageSelect");
+const diffSelect = document.getElementById("difficulty");
+const winText = document.getElementById("winText");
+
+let size = parseInt(diffSelect.value);
+let pieces = [];
+let img = new Image();
+let selected = null, offsetX = 0, offsetY = 0;
+
+img.src = imageSelect.value;
+img.onload = () => initPuzzle();
+
+imageSelect.addEventListener("change", () => {
+  img.src = imageSelect.value;
+});
+
+diffSelect.addEventListener("change", () => {
+  size = parseInt(diffSelect.value);
+  if (img.complete) initPuzzle();
+});
+
+function initPuzzle() {
+  winText.style.display = "none";
+  pieces = [];
+  const w = canvas.width / size;
+  const h = canvas.height / size;
+
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      pieces.push({
+        sx: x * (img.width / size),
+        sy: y * (img.height / size),
+        x: Math.random() * (canvas.width - w),
+        y: Math.random() * (canvas.height - h),
+        correctX: x * w,
+        correctY: y * h,
+        w, h,
+        fixed: false
+      });
+    }
+  }
+  draw();
+}
+
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.globalAlpha = 0.1;
+  ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
+  ctx.globalAlpha = 1.0;
+
+  pieces.forEach(p => {
+    ctx.save();
+    if (!p.fixed) {
+      ctx.shadowColor = "rgba(0,0,0,0.1)";
+      ctx.shadowBlur = 10;
+    }
+    ctx.drawImage(img, p.sx, p.sy, img.width/size, img.height/size, p.x, p.y, p.w, p.h);
+    ctx.strokeStyle = "rgba(255,255,255,0.5)";
+    ctx.strokeRect(p.x, p.y, p.w, p.h);
+    ctx.restore();
+  });
+}
+
+function getCoords(e) {
+  const r = canvas.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return { x: clientX - r.left, y: clientY - r.top };
+}
+
+function handleDown(e) {
+  const {x, y} = getCoords(e);
+  let hit = false;
+
+  for (let i = pieces.length-1; i >= 0; i--) {
+    const p = pieces[i];
+    if (p.fixed) continue;
+    if (x > p.x && x < p.x+p.w && y > p.y && y < p.y+p.h) {
+      selected = p;
+      offsetX = x - p.x;
+      offsetY = y - p.y;
+      pieces.splice(i,1);
+      pieces.push(p);
+      hit = true;
+      break;
+    }
+  }
+  
+  // ถ้ากดโดนชิ้นส่วน ให้หยุดการเลื่อนหน้าจอ
+  if (hit && e.cancelable) e.preventDefault();
+}
+
+function handleMove(e) {
+  if (!selected) return;
+  // ป้องกันหน้าจอสั่น/เลื่อนขณะลากชิ้นส่วน
+  if (e.cancelable) e.preventDefault();
+  
+  const {x, y} = getCoords(e);
+  selected.x = x - offsetX;
+  selected.y = y - offsetY;
+  draw();
+}
+
+function handleUp() {
+  if (!selected) return;
+  if (Math.abs(selected.x - selected.correctX) < 20 && Math.abs(selected.y - selected.correctY) < 20) {
+    selected.x = selected.correctX;
+    selected.y = selected.correctY;
+    selected.fixed = true;
+  }
+  selected = null;
+  draw();
+  checkWin();
+}
+
+// Mouse Events
+canvas.addEventListener("mousedown", handleDown);
+window.addEventListener("mousemove", handleMove);
+window.addEventListener("mouseup", handleUp);
+
+// Touch Events (สำหรับ iPad)
+canvas.addEventListener("touchstart", handleDown, {passive: false});
+canvas.addEventListener("touchmove", handleMove, {passive: false});
+canvas.addEventListener("touchend", handleUp);
+
+function shufflePieces() {
+  winText.style.display = "none";
+  pieces.forEach(p => {
+    p.fixed = false;
+    p.x = Math.random() * (canvas.width - p.w);
+    p.y = Math.random() * (canvas.height - p.h);
+  });
+  draw();
+}
+
+function checkWin() {
+  if (pieces.every(p => p.fixed)) {
+    winText.style.display = "block";
+  }
+}
+</script>
+
+</body>
+</html>

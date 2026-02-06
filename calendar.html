@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📅 Love Calendar - Our Journey</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&family=Caveat:wght@700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #fff5f7 0%, #ffd1dc 100%);
+      --glass: rgba(255, 255, 255, 0.5);
+      --accent-pink: #ff5e99;
+      --soft-pink: #ff8fb3;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      font-family: 'Kanit', sans-serif;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .header h1 {
+      font-family: 'Caveat', cursive;
+      font-size: 4rem;
+      color: var(--accent-pink);
+      margin: 0;
+      filter: drop-shadow(2px 2px 0px white);
+    }
+
+    .header p {
+      color: #777;
+      font-size: 1.1rem;
+      margin-top: 5px;
+    }
+
+    /* --- Calendar Grid (iPad Friendly) --- */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 25px;
+    }
+
+    .month-card {
+      background: var(--glass);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 10px 30px rgba(255, 143, 179, 0.1);
+      cursor: pointer;
+    }
+
+    .month-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 20px 40px rgba(255, 143, 179, 0.2);
+    }
+
+    .img-wrapper {
+      width: 100%;
+      height: 220px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .month-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+
+    .month-card:hover img {
+      transform: scale(1.1);
+    }
+
+    .month-info {
+      padding: 20px;
+      text-align: center;
+    }
+
+    .month-name {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent-pink);
+      margin-bottom: 8px;
+    }
+
+    .note {
+      font-size: 0.9rem;
+      color: #666;
+      line-height: 1.4;
+    }
+
+    /* --- Fullscreen Overlay --- */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 240, 245, 0.85);
+      backdrop-filter: blur(10px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      cursor: zoom-out;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .overlay img {
+      max-width: 85%;
+      max-height: 85vh;
+      border-radius: 25px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+      border: 5px solid white;
+    }
+
+    /* --- Back Button --- */
+    .btn-back {
+      position: fixed;
+      top: 30px;
+      left: 30px;
+      background: white;
+      padding: 12px 20px;
+      border-radius: 50px;
+      text-decoration: none;
+      color: var(--accent-pink);
+      font-weight: bold;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      z-index: 100;
+      transition: 0.3s;
+    }
+
+    .btn-back:hover {
+      background: var(--accent-pink);
+      color: white;
+    }
+
+    .ending-section {
+      text-align: center;
+      padding: 80px 0;
+    }
+
+    .ending-card {
+      background: var(--glass);
+      backdrop-filter: blur(15px);
+      padding: 40px;
+      border-radius: 40px;
+      border: 1px solid white;
+      display: inline-block;
+    }
+
+    .ending-card h2 {
+      font-family: 'Caveat', cursive;
+      font-size: 3rem;
+      color: var(--accent-pink);
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<a href="Activity1.html" class="btn-back">← กลับหน้าหลัก</a>
+
+<div class="container">
+  <div class="header">
+    <h1>Our Calendar</h1>
+    <p>ทุกช่วงเวลาที่มีเธอ... คือของขวัญที่พิเศษที่สุด 🎁</p>
+  </div>
+
+  <div class="calendar-grid">
+    <div class="month-card" onclick="openImg('S__16228357.jpg')">
+      <div class="img-wrapper"><img src="S__16228357.jpg" alt="Jan"></div>
+      <div class="month-info">
+        <div class="month-name">JANUARY</div>
+        <div class="note">เริ่มต้นปีด้วยรอยยิ้มหวานๆ ของเธอ 🌸</div>
+      </div>
+    </div>
+
+    <div class="month-card" onclick="openImg('images.jpg')">
+      <div class="img-wrapper"><img src="images.jpg" alt="Feb"></div>
+      <div class="month-info">
+        <div class="month-name">FEBRUARY</div>
+        <div class="note">เดือนแห่งความรัก และเรามีกันเสมอ 💖</div>
+      </div>
+    </div>
+
+    <div class="month-card" onclick="openImg('images.jpg')">
+      <div class="img-wrapper"><img src="images.jpg" alt="Mar"></div>
+      <div class="month-info">
+        <div class="month-name">MARCH</div>
+        <div class="note">ขอบคุณที่คอยซัพพอร์ตกันในทุกวันนะ ✨</div>
+      </div>
+    </div>
+
+    <div class="month-card" onclick="openImg('images.jpg')">
+      <div class="img-wrapper"><img src="images.jpg" alt="Dec"></div>
+      <div class="month-info">
+        <div class="month-name">DECEMBER</div>
+        <div class="note">ขอบคุณที่อยู่ด้วยกันจนถึงสิ้นปีนะ รักเธอที่สุดเลย 🎄</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ending-section">
+    <div class="ending-card">
+      <h2>Stay Together Forever</h2>
+      <p>เค้าอยากให้ปีต่อๆ ไป มีเธออยู่ในรูปภาพทุกใบเลยนะ 🥰</p>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeImg()">
+  <img id="fullImg" src="">
+</div>
+
+<script>
+  const overlay = document.getElementById("overlay");
+  const fullImg = document.getElementById("fullImg");
+
+  function openImg(src) {
+    fullImg.src = src;
+    overlay.style.display = "flex";
+    document.body.style.overflow = "hidden"; // ปิดการ scroll เมื่อเปิดรูป
+  }
+
+  function closeImg() {
+    overlay.style.display = "none";
+    document.body.style.overflow = "auto";
+  }
+
+  // เพิ่มลูกเล่นหัวใจจางๆ เมื่อเลื่อนหน้าจอ
+  window.addEventListener('scroll', () => {
+    if (Math.random() > 0.95) {
+      const heart = document.createElement("div");
+      heart.innerHTML = "💖";
+      heart.style.position = "fixed";
+      heart.style.left = Math.random() * 100 + "vw";
+      heart.style.bottom = "-20px";
+      heart.style.fontSize = "20px";
+      heart.style.transition = "all 3s ease-out";
+      heart.style.pointerEvents = "none";
+      heart.style.opacity = "0.6";
+      document.body.appendChild(heart);
+
+      setTimeout(() => {
+        heart.style.transform = "translateY(-100vh) rotate(360deg)";
+        heart.style.opacity = "0";
+      }, 100);
+
+      setTimeout(() => heart.remove(), 3000);
+    }
+  });
+</script>
+
+</body>
+</html>
